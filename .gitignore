@@ -1,14 +1,90 @@
-# Environment and Secrets
+# ============================================
+# SENSITIVE FILES - NEVER COMMIT THESE!
+# ============================================
+
+# Environment variables (contains API keys)
 .env
 .env.local
+.env.development
 .env.production
-*.key
+.env.test
 
-# Python
+# Kaggle API credentials
+.kaggle/
+kaggle.json
+~/.kaggle/
+
+# API Keys and secrets
+**/secrets/
+**/credentials/
+**/*secret*
+**/*key*
+**/*token*
+config_secrets.py
+
+# ============================================
+# DATABASE FILES (May contain sensitive data)
+# ============================================
+
+# SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+database/
+*.db-journal
+
+# Database dumps
+*.sql
+*.dump
+
+# ============================================
+# LOGS (May contain sensitive information)
+# ============================================
+
+# Log files
+*.log
+logs/
+etl_pipeline.log
+scraping.log
+
+# Debug files
+debug.log
+error.log
+
+# ============================================
+# DATA FILES (Large/sensitive)
+# ============================================
+
+# Raw data
+data/raw/
+data/processed/
+data/live/
+data/synthetic/
+data/
+
+# CSV files (may be large or sensitive)
+*.csv
+Reviews.csv
+amazon_reviews.csv
+
+# JSON reports
+etl_report_*.json
+scraping_log_*.json
+dataset_summary.json
+
+# ============================================
+# PYTHON SPECIFIC
+# ============================================
+
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
+
+# C extensions
 *.so
+
+# Distribution / packaging
 .Python
 build/
 develop-eggs/
@@ -22,77 +98,86 @@ parts/
 sdist/
 var/
 wheels/
+pip-wheel-metadata/
+share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
 MANIFEST
 
-# Virtual Environment
-venv/
+# Virtual environments
 env/
+venv/
 ENV/
+env.bak/
+venv.bak/
 .venv/
 
-# Database Files
-*.db
-*.sqlite
-*.sqlite3
-database/*.db
-database/*.sqlite
-
-# Data Files (Large datasets)
-data/raw/*.csv
-data/raw/*.json
-data/raw/*.parquet
-data/processed/*.csv
-data/live/*.csv
-*.zip
-*.tar.gz
-
-# Keep sample/test data
-!tests/sample_data/
-!tests/sample_data/*.csv
-!tests/sample_data/*.json
-
-# Logs
-logs/
-*.log
-*.log.*
-
-# ML Models (if saved locally)
-models/
-*.pkl
-*.joblib
-*.h5
-*.pt
-*.pth
-
-# Jupyter Notebooks
-.ipynb_checkpoints/
-*.ipynb
-
-# IDE
+# IDEs
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# OS
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# ============================================
+# OPERATING SYSTEM
+# ============================================
+
+# macOS
 .DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
 Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+# ============================================
+# TEMPORARY FILES
+# ============================================
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
 
 # Cache
 .cache/
 *.cache
-
-# Streamlit
-.streamlit/secrets.toml
 
 # Testing
 .pytest_cache/
 .coverage
 htmlcov/
 
-# Documentation build
-docs/_build/
+# ============================================
+# DEPLOYMENT & CI/CD
+# ============================================
+
+# Docker
+.dockerignore
+Dockerfile.dev
+
+# CI/CD secrets
+.github/secrets/
+.gitlab-ci-secrets/
+
+# ============================================
+# CUSTOM PROJECT EXCLUDES
+# ============================================
+
+# Your specific files to exclude
+pipeline_reports/
+model_outputs/
+scraped_data/
+backup/
+old/
