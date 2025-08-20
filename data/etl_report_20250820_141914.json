@@ -1,0 +1,218 @@
+{
+  "success": true,
+  "data": "          Id  product_id         user_id  ... day_of_week  is_weekend  rating_deviation\n0      11463  B005C3IVN8   AWMFDVVGHBS36  ...           3       False          0.000000\n1      14922  B000DZKKKC  A1LE6CQ8E78D8A  ...           1       False          0.272727\n2      40359  B000J4DSGK  A3NCV7XVGNHRT6  ...           1       False          0.000000\n3      25834  B000EM8KZ6   AUU45LWKPAUO1  ...           2       False          0.545455\n4      43401  B0000DJDHK  A31MO4UKTTR6K1  ...           0       False          2.400000\n...      ...         ...             ...  ...         ...         ...               ...\n19992  47995  B004SRH2B6  A28BRJK5W0SYG3  ...           0       False         -1.708738\n19993  28163  B007POT6RM  A3HAA7H8PBVM78  ...           6        True         -1.232558\n19994  31209  B007M83302  A1YGDKJ7CAOQN3  ...           4       False         -2.231959\n19995  47385  B001DTML8G  A29GD1K4UDA6KZ  ...           0       False          0.000000\n19996  15060  B002ACI89Q  A3UBDTBT42WUXN  ...           1       False         -1.000000\n\n[19997 rows x 24 columns]",
+  "stats": {
+    "start_time": "2025-08-20 14:18:34.854614",
+    "end_time": "2025-08-20 14:19:14.821634",
+    "total_duration": 39.96702,
+    "stages_completed": [
+      "data_loading",
+      "data_cleaning",
+      "data_validation",
+      "database_loading",
+      "quality_assessment"
+    ],
+    "total_records_processed": 50000,
+    "final_records": 19997,
+    "data_quality_score": 0.6999984372655899,
+    "errors": []
+  },
+  "quality_report": {
+    "data_completeness": {
+      "score": 0.9999937490623594,
+      "missing_cells": "3",
+      "total_cells": 479928,
+      "details": {
+        "Id": 0,
+        "product_id": 0,
+        "user_id": 0,
+        "ProfileName": 3,
+        "helpful_votes": 0,
+        "total_votes": 0,
+        "rating": 0,
+        "timestamp": 0,
+        "review_title": 0,
+        "review_text": 0,
+        "date": 0,
+        "review_length": 0,
+        "word_count": 0,
+        "char_count": 0,
+        "sentence_count": 0,
+        "avg_word_length": 0,
+        "punctuation_ratio": 0,
+        "capital_ratio": 0,
+        "helpfulness_ratio": 0,
+        "year": 0,
+        "month": 0,
+        "day_of_week": 0,
+        "is_weekend": 0,
+        "rating_deviation": 0
+      }
+    },
+    "data_consistency": {
+      "score": 1.0,
+      "checks_performed": 2,
+      "details": [
+        1.0,
+        1.0
+      ]
+    },
+    "data_accuracy": {
+      "score": 0.8,
+      "method": "estimated_based_on_cleaning",
+      "note": "Actual accuracy requires ground truth labels"
+    },
+    "data_timeliness": {
+      "score": 0,
+      "latest_date": "2012-10-26 00:00:00",
+      "days_old": 4681
+    },
+    "sample_statistics": {
+      "total_rows": 19997,
+      "total_columns": 24,
+      "memory_usage_mb": 15.721960067749023,
+      "rating_stats": {
+        "mean": 4.139520928139221,
+        "std": 1.349333528346021,
+        "distribution": {
+          "5": 12615,
+          "4": 2719,
+          "1": 2016,
+          "3": 1517,
+          "2": 1130
+        }
+      },
+      "text_stats": {
+        "avg_length": 386.2926438965845,
+        "avg_words": 73.2539380907136
+      }
+    },
+    "overall_score": 0.6999984372655899
+  },
+  "final_report": {
+    "pipeline_execution": {
+      "timestamp": "2025-08-20T14:19:14.822289",
+      "duration_seconds": 39.96702,
+      "stages_completed": [
+        "data_loading",
+        "data_cleaning",
+        "data_validation",
+        "database_loading",
+        "quality_assessment"
+      ],
+      "success": true
+    },
+    "data_summary": {
+      "final_records": 19997,
+      "original_records": 50000,
+      "retention_rate": 0.39994,
+      "columns": [
+        "Id",
+        "product_id",
+        "user_id",
+        "ProfileName",
+        "helpful_votes",
+        "total_votes",
+        "rating",
+        "timestamp",
+        "review_title",
+        "review_text",
+        "date",
+        "review_length",
+        "word_count",
+        "char_count",
+        "sentence_count",
+        "avg_word_length",
+        "punctuation_ratio",
+        "capital_ratio",
+        "helpfulness_ratio",
+        "year",
+        "month",
+        "day_of_week",
+        "is_weekend",
+        "rating_deviation"
+      ]
+    },
+    "quality_metrics": {
+      "data_completeness": {
+        "score": 0.9999937490623594,
+        "missing_cells": "3",
+        "total_cells": 479928,
+        "details": {
+          "Id": 0,
+          "product_id": 0,
+          "user_id": 0,
+          "ProfileName": 3,
+          "helpful_votes": 0,
+          "total_votes": 0,
+          "rating": 0,
+          "timestamp": 0,
+          "review_title": 0,
+          "review_text": 0,
+          "date": 0,
+          "review_length": 0,
+          "word_count": 0,
+          "char_count": 0,
+          "sentence_count": 0,
+          "avg_word_length": 0,
+          "punctuation_ratio": 0,
+          "capital_ratio": 0,
+          "helpfulness_ratio": 0,
+          "year": 0,
+          "month": 0,
+          "day_of_week": 0,
+          "is_weekend": 0,
+          "rating_deviation": 0
+        }
+      },
+      "data_consistency": {
+        "score": 1.0,
+        "checks_performed": 2,
+        "details": [
+          1.0,
+          1.0
+        ]
+      },
+      "data_accuracy": {
+        "score": 0.8,
+        "method": "estimated_based_on_cleaning",
+        "note": "Actual accuracy requires ground truth labels"
+      },
+      "data_timeliness": {
+        "score": 0,
+        "latest_date": "2012-10-26 00:00:00",
+        "days_old": 4681
+      },
+      "sample_statistics": {
+        "total_rows": 19997,
+        "total_columns": 24,
+        "memory_usage_mb": 15.721960067749023,
+        "rating_stats": {
+          "mean": 4.139520928139221,
+          "std": 1.349333528346021,
+          "distribution": {
+            "5": 12615,
+            "4": 2719,
+            "1": 2016,
+            "3": 1517,
+            "2": 1130
+          }
+        },
+        "text_stats": {
+          "avg_length": 386.2926438965845,
+          "avg_words": 73.2539380907136
+        }
+      },
+      "overall_score": 0.6999984372655899
+    },
+    "business_insights": {
+      "avg_rating": 4.139520928139221,
+      "total_products": 4106,
+      "total_users": 19059,
+      "date_range": {
+        "start": "2003-10-25T00:00:00",
+        "end": "2012-10-26T00:00:00"
+      }
+    }
+  }
+}

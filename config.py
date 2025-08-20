@@ -101,3 +101,10 @@ current_config = config_map.get(
     os.getenv("ENVIRONMENT", "development"), 
     DevelopmentConfig
 )
+
+# Module-level exports for backward compatibility
+DATABASE_URL = current_config.DATABASE_URL
+KAGGLE_CONFIG = {
+    'dataset': 'snap/amazon-fine-food-reviews',
+    'download_path': str(DATA_DIR)
+}
