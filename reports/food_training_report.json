@@ -1,0 +1,239 @@
+{
+  "training_session": {
+    "timestamp": "2025-08-21T11:29:42.563138",
+    "configuration": {
+      "sentiment_analysis": {
+        "batch_size": 500,
+        "enable_openai": false,
+        "save_results": true,
+        "dataset_type": "food_reviews"
+      },
+      "fake_detection": {
+        "training_samples": 2000,
+        "test_split": 0.2,
+        "save_model": true,
+        "dataset_type": "food_reviews"
+      },
+      "recommendations": {
+        "min_user_ratings": 1,
+        "n_recommendations": 10,
+        "save_results": true,
+        "dataset_type": "food_recommendations"
+      }
+    },
+    "database_path": "./database/review_intelligence.db",
+    "dataset_type": "Amazon Fine Food Reviews"
+  },
+  "results": {
+    "sentiment_analysis": {
+      "status": "success",
+      "samples_processed": 500,
+      "training_time": 200.46062684059143,
+      "statistics": {
+        "overall_stats": {
+          "total_analyzed": 500.0,
+          "avg_confidence": 0.8479482274055481,
+          "avg_sentiment_score": 4.031732005476951,
+          "avg_processing_time": 0.3942685422897339,
+          "positive_count": 366.0,
+          "negative_count": 99.0,
+          "neutral_count": 35.0
+        },
+        "food_aspect_stats": {
+          "quality": {
+            "avg_sentiment": 3.842857142857143,
+            "count": 98
+          },
+          "shipping": {
+            "avg_sentiment": 3.8071428571428565,
+            "count": 84
+          },
+          "taste": {
+            "avg_sentiment": 3.725663716814159,
+            "count": 226
+          },
+          "flavor": {
+            "avg_sentiment": 3.6466165413533833,
+            "count": 133
+          },
+          "texture": {
+            "avg_sentiment": 3.8247422680412377,
+            "count": 97
+          },
+          "value": {
+            "avg_sentiment": 3.7482352941176464,
+            "count": 85
+          },
+          "ingredients": {
+            "avg_sentiment": 3.8129870129870125,
+            "count": 77
+          },
+          "packaging": {
+            "avg_sentiment": 3.764383561643835,
+            "count": 146
+          },
+          "price": {
+            "avg_sentiment": 3.7504,
+            "count": 125
+          },
+          "freshness": {
+            "avg_sentiment": 3.753846153846154,
+            "count": 52
+          }
+        },
+        "timestamp": "2025-08-21T11:28:14.793056",
+        "dataset_type": "Amazon Fine Food Reviews"
+      },
+      "dataset_type": "Amazon Fine Food Reviews",
+      "performance_metrics": {
+        "avg_confidence": 0.8479482274055481,
+        "avg_sentiment_score": 4.031732005476951,
+        "positive_ratio": 0.732,
+        "processing_rate": 2.494255395088661
+      }
+    },
+    "fake_detection": {
+      "status": "success",
+      "training_samples": 2000,
+      "features_count": 24,
+      "training_time": 78.92078685760498,
+      "dataset_type": "Amazon Fine Food Reviews",
+      "model_performance": {
+        "train_score": 1.0,
+        "test_score": 1.0,
+        "auc_score": 1.0,
+        "cv_mean": 1.0,
+        "cv_std": 0.0
+      },
+      "best_params": {
+        "max_depth": 10,
+        "min_samples_leaf": 1,
+        "min_samples_split": 2,
+        "n_estimators": 100
+      },
+      "feature_importance": [
+        {
+          "feature": "text_sentence_count",
+          "importance": 0.19178096049710885
+        },
+        {
+          "feature": "text_exclamation_ratio",
+          "importance": 0.1890387738104528
+        },
+        {
+          "feature": "text_word_count",
+          "importance": 0.16595668814457876
+        },
+        {
+          "feature": "text_length",
+          "importance": 0.14886195593044846
+        },
+        {
+          "feature": "text_punct_ratio",
+          "importance": 0.10488595882370319
+        },
+        {
+          "feature": "text_caps_ratio",
+          "importance": 0.051465427833599385
+        },
+        {
+          "feature": "review_total_votes",
+          "importance": 0.033776424911425476
+        },
+        {
+          "feature": "text_avg_word_length",
+          "importance": 0.03324039183441606
+        },
+        {
+          "feature": "review_helpful_votes",
+          "importance": 0.02332827042812808
+        },
+        {
+          "feature": "text_sentiment_extreme",
+          "importance": 0.01565647358609961
+        }
+      ],
+      "batch_test_results": {
+        "samples_tested": 100,
+        "avg_fake_probability": 0.006320000000000001
+      }
+    },
+    "recommendation_system": {
+      "status": "success",
+      "training_time": 8.843568563461304,
+      "dataset_type": "Amazon Fine Food Reviews",
+      "system_statistics": {
+        "total_users": 19059,
+        "total_products": 4106,
+        "total_ratings": 19970,
+        "matrix_sparsity": 99.97448127276832,
+        "avg_user_ratings": 1.0477989401332704,
+        "avg_product_ratings": 4.863614223088164,
+        "has_user_similarity": false,
+        "has_item_similarity": false,
+        "has_matrix_factorization": true,
+        "timestamp": "2025-08-21T11:29:36.339201"
+      },
+      "sample_recommendations": {
+        "users_tested": 10,
+        "successful_recommendations": 10,
+        "avg_predicted_rating": 4.806784664998958,
+        "avg_confidence": 0.49160000000000004
+      },
+      "recommendation_details": [
+        {
+          "user_id": "#oc-R3LI5WJM4WD02C",
+          "recommendations_count": 10,
+          "avg_predicted_rating": 4.7599554788594265,
+          "avg_confidence": 0.5299999999999999
+        },
+        {
+          "user_id": "A1003ACBU13X6E",
+          "recommendations_count": 10,
+          "avg_predicted_rating": 4.838004122425312,
+          "avg_confidence": 0.466
+        },
+        {
+          "user_id": "A1004703RC79J9",
+          "recommendations_count": 10,
+          "avg_predicted_rating": 4.7599554788594265,
+          "avg_confidence": 0.5299999999999999
+        },
+        {
+          "user_id": "A100IC7JRCQDUD",
+          "recommendations_count": 10,
+          "avg_predicted_rating": 4.838004122425312,
+          "avg_confidence": 0.466
+        },
+        {
+          "user_id": "A100KABITNCJQZ",
+          "recommendations_count": 10,
+          "avg_predicted_rating": 4.838004122425312,
+          "avg_confidence": 0.466
+        }
+      ]
+    }
+  },
+  "system_evaluation": {
+    "database_health": {
+      "reviews": 19997,
+      "sentiment_analysis": 500,
+      "fake_detection": 100,
+      "user_recommendations": 10
+    },
+    "model_coverage": {
+      "sentiment_analysis": true,
+      "fake_detection": true,
+      "recommendations": true
+    },
+    "data_pipeline_status": "operational",
+    "dataset_type": "Amazon Fine Food Reviews"
+  },
+  "summary": {
+    "total_models_trained": 3,
+    "successful_models": 3,
+    "success_rate": 1.0,
+    "overall_status": "success",
+    "dataset_focus": "Amazon Fine Food Reviews"
+  }
+}

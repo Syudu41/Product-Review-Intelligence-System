@@ -10,13 +10,13 @@ import sqlite3
 import logging
 import json
 import time
+import sys
+import os
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
-import os
-import sys
 
-# Add project root to Python path
+# Add project root to Python path to find config module
 project_root = Path(__file__).parent.parent.parent
 sys.path.append(str(project_root))
 

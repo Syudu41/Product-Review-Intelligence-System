@@ -8,6 +8,7 @@ import numpy as np
 import sqlite3
 import logging
 import os
+import sys
 import zipfile
 import requests
 from pathlib import Path
@@ -15,6 +16,10 @@ from typing import Optional, Dict, List, Tuple
 from datetime import datetime
 import json
 import hashlib
+
+# Add project root to Python path to find config module
+project_root = Path(__file__).parent.parent.parent
+sys.path.append(str(project_root))
 
 from config import DATABASE_URL, DATA_DIR, KAGGLE_CONFIG
 

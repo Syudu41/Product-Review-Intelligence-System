@@ -17,10 +17,13 @@ SYNTHETIC_DATA_DIR = DATA_DIR / "synthetic"
 LIVE_DATA_DIR = DATA_DIR / "live"
 DATABASE_DIR = PROJECT_ROOT / "database"
 LOGS_DIR = PROJECT_ROOT / "logs"
+MODELS_DIR = PROJECT_ROOT / "models"  # Added for model storage
+REPORTS_DIR = PROJECT_ROOT / "reports"  # Added for reports
 
 # Create directories if they don't exist
 for directory in [DATA_DIR, RAW_DATA_DIR, PROCESSED_DATA_DIR, 
-                 SYNTHETIC_DATA_DIR, LIVE_DATA_DIR, DATABASE_DIR, LOGS_DIR]:
+                 SYNTHETIC_DATA_DIR, LIVE_DATA_DIR, DATABASE_DIR, 
+                 LOGS_DIR, MODELS_DIR, REPORTS_DIR]:  # Added new directories
     directory.mkdir(exist_ok=True)
 
 class Config:
@@ -55,6 +58,38 @@ class Config:
     # Data Processing
     SAMPLE_SIZE_FOR_TESTING = 1000  # Use smaller dataset for testing
     BATCH_SIZE = 100
+    
+    # ML Model Configuration (Added for our corrected files)
+    MODEL_CONFIG = {
+        "sentiment_analysis": {
+            "model_name": "cardiffnlp/twitter-roberta-base-sentiment-latest",
+            "batch_size": 500,
+            "max_length": 512,
+            "food_aspects": ["taste", "flavor", "quality", "freshness", "price", 
+                           "packaging", "shipping", "texture", "ingredients", "value"]
+        },
+        "fake_detection": {
+            "training_samples": 2000,
+            "test_split": 0.2,
+            "random_state": 42,
+            "model_path": str(MODELS_DIR / "food_fake_detector.pkl")
+        },
+        "recommendations": {
+            "n_recommendations": 10,
+            "min_user_ratings": 1,
+            "similarity_threshold": 0.1
+        }
+    }
+    
+    # ETL Pipeline Configuration (Added for our corrected files)
+    ETL_CONFIG = {
+        "target_sample_size": 20000,
+        "enable_kaggle_download": True,
+        "enable_data_validation": True,
+        "enable_quality_checks": True,
+        "backup_synthetic_data": True,
+        "dataset_type": "Amazon Fine Food Reviews"
+    }
     
     @classmethod
     def validate_config(cls):
@@ -108,3 +143,12 @@ KAGGLE_CONFIG = {
     'dataset': 'snap/amazon-fine-food-reviews',
     'download_path': str(DATA_DIR)
 }
+
+# Additional exports needed by our corrected files
+DATA_DIR = str(DATA_DIR)  # Convert Path to string for compatibility
+
+print(f"✅ Configuration loaded successfully")
+print(f"📁 Project Root: {PROJECT_ROOT}")
+print(f"💾 Database: {DATABASE_URL}")
+print(f"📊 Data Directory: {DATA_DIR}")
+print(f"🎯 Environment: {current_config.ENVIRONMENT}")
