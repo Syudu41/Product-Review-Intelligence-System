@@ -1,0 +1,213 @@
+{
+  "training_session": {
+    "timestamp": "2025-08-20T19:51:06.741642",
+    "configuration": {
+      "sentiment_analysis": {
+        "batch_size": 500,
+        "enable_openai": false,
+        "save_results": true
+      },
+      "fake_detection": {
+        "training_samples": 2000,
+        "test_split": 0.2,
+        "save_model": true
+      },
+      "recommendations": {
+        "min_user_ratings": 1,
+        "n_recommendations": 10,
+        "save_results": true
+      }
+    },
+    "database_path": "./database/review_intelligence.db"
+  },
+  "results": {
+    "sentiment_analysis": {
+      "status": "success",
+      "samples_processed": 500,
+      "training_time": 150.5319700241089,
+      "statistics": {
+        "overall_stats": {
+          "total_analyzed": 500.0,
+          "avg_confidence": 0.8479482274055481,
+          "avg_sentiment_score": 4.031732005476951,
+          "avg_processing_time": 0.29983690500259397,
+          "positive_count": 366.0,
+          "negative_count": 99.0,
+          "neutral_count": 35.0
+        },
+        "aspect_stats": {
+          "quality": {
+            "avg_sentiment": 3.825,
+            "count": 32
+          },
+          "shipping": {
+            "avg_sentiment": 3.91157894736842,
+            "count": 95
+          },
+          "value": {
+            "avg_sentiment": 3.643373493975904,
+            "count": 83
+          },
+          "service": {
+            "avg_sentiment": 3.710344827586207,
+            "count": 29
+          },
+          "price": {
+            "avg_sentiment": 3.8928,
+            "count": 125
+          },
+          "packaging": {
+            "avg_sentiment": 3.817857142857143,
+            "count": 56
+          }
+        },
+        "timestamp": "2025-08-20T19:49:54.749362"
+      },
+      "performance_metrics": {
+        "avg_confidence": 0.8479482274055481,
+        "avg_sentiment_score": 4.031732005476951,
+        "positive_ratio": 0.732,
+        "processing_rate": 3.3215535538392347
+      }
+    },
+    "fake_detection": {
+      "status": "success",
+      "training_samples": 2000,
+      "features_count": 23,
+      "training_time": 65.01846671104431,
+      "model_performance": {
+        "train_score": 1.0,
+        "test_score": 1.0,
+        "auc_score": 1.0,
+        "cv_mean": 1.0,
+        "cv_std": 0.0
+      },
+      "best_params": {
+        "max_depth": 10,
+        "min_samples_leaf": 1,
+        "min_samples_split": 2,
+        "n_estimators": 100
+      },
+      "feature_importance": [
+        {
+          "feature": "text_word_count",
+          "importance": 0.2742762280720017
+        },
+        {
+          "feature": "text_length",
+          "importance": 0.17214381767759998
+        },
+        {
+          "feature": "text_sentence_count",
+          "importance": 0.1593505424436339
+        },
+        {
+          "feature": "text_exclamation_ratio",
+          "importance": 0.1525438076415396
+        },
+        {
+          "feature": "text_punct_ratio",
+          "importance": 0.07780569483242966
+        },
+        {
+          "feature": "text_caps_ratio",
+          "importance": 0.05743611674567364
+        },
+        {
+          "feature": "review_helpful_votes",
+          "importance": 0.029239419251212904
+        },
+        {
+          "feature": "review_total_votes",
+          "importance": 0.021171002736845603
+        },
+        {
+          "feature": "text_generic_phrase_count",
+          "importance": 0.014176541729182713
+        },
+        {
+          "feature": "text_avg_word_length",
+          "importance": 0.012735613523616584
+        }
+      ],
+      "batch_test_results": {
+        "samples_tested": 100,
+        "avg_fake_probability": 0.0014000000000000002
+      }
+    },
+    "recommendation_system": {
+      "status": "success",
+      "training_time": 6.968579530715942,
+      "system_statistics": {
+        "total_users": 19059,
+        "total_products": 4106,
+        "total_ratings": 19970,
+        "matrix_sparsity": 99.97448127276832,
+        "avg_user_ratings": 1.0477989401332704,
+        "avg_product_ratings": 4.863614223088164,
+        "has_user_similarity": false,
+        "has_item_similarity": false,
+        "has_matrix_factorization": true,
+        "timestamp": "2025-08-20T19:51:01.073009"
+      },
+      "sample_recommendations": {
+        "users_tested": 10,
+        "successful_recommendations": 10,
+        "avg_predicted_rating": 4.806784664998958,
+        "avg_confidence": 0.49160000000000004
+      },
+      "recommendation_details": [
+        {
+          "user_id": "#oc-R3LI5WJM4WD02C",
+          "recommendations_count": 10,
+          "avg_predicted_rating": 4.7599554788594265,
+          "avg_confidence": 0.5299999999999999
+        },
+        {
+          "user_id": "A1003ACBU13X6E",
+          "recommendations_count": 10,
+          "avg_predicted_rating": 4.838004122425312,
+          "avg_confidence": 0.466
+        },
+        {
+          "user_id": "A1004703RC79J9",
+          "recommendations_count": 10,
+          "avg_predicted_rating": 4.7599554788594265,
+          "avg_confidence": 0.5299999999999999
+        },
+        {
+          "user_id": "A100IC7JRCQDUD",
+          "recommendations_count": 10,
+          "avg_predicted_rating": 4.838004122425312,
+          "avg_confidence": 0.466
+        },
+        {
+          "user_id": "A100KABITNCJQZ",
+          "recommendations_count": 10,
+          "avg_predicted_rating": 4.838004122425312,
+          "avg_confidence": 0.466
+        }
+      ]
+    }
+  },
+  "system_evaluation": {
+    "database_health": {
+      "reviews": 19997,
+      "sentiment_analysis": 500,
+      "fake_detection": 100,
+      "user_recommendations": 10
+    },
+    "model_coverage": {
+      "sentiment_analysis": true,
+      "fake_detection": true,
+      "recommendations": true
+    },
+    "data_pipeline_status": "operational"
+  },
+  "summary": {
+    "total_models_trained": 3,
+    "successful_models": 3,
+    "success_rate": 1.0,
+    "overall_status": "success"
+  }
+}
