@@ -1,12 +1,18 @@
 import sqlite3
 import pandas as pd
 
-# Connect to your database
+# Connect to your existing database
 conn = sqlite3.connect('./database/review_intelligence.db')
 
-# Check what you have
-print("Tables:", pd.read_sql("SELECT name FROM sqlite_master WHERE type='table'", conn)['name'].tolist())
-print("Review count:", pd.read_sql("SELECT COUNT(*) as count FROM reviews", conn)['count'][0])
-print("Rating dist:", pd.read_sql("SELECT rating, COUNT(*) as count FROM reviews GROUP BY rating", conn))
+# Check what products you have
+products_sample = pd.read_sql_query("SELECT * FROM products LIMIT 10", conn)
+print("PRODUCTS SAMPLE:")
+print(products_sample)
+
+# Check review content
+reviews_sample = pd.read_sql_query("SELECT review_text FROM reviews LIMIT 5", conn)
+print("\nREVIEW SAMPLES:")
+for i, review in enumerate(reviews_sample['review_text']):
+    print(f"{i+1}. {review[:100]}...")
 
 conn.close()

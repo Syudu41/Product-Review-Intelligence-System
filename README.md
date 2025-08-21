@@ -1,4 +1,4 @@
-# 🧠 Product Review Intelligence System
+# 🧠 Food Review Intelligence System
 
 **A production-ready ML-powered review analysis platform with sentiment analysis, fake review detection, and personalized recommendations.**
 
@@ -28,7 +28,7 @@
 | Metric | Value | Status |
 |--------|-------|--------|
 | **Total Reviews** | 19,997 | ✅ Target: 20K |
-| **Unique Products** | 4,106 | ✅ Electronics Category |
+| **Unique Products** | 4,106 | ✅ Food & Beverage Category |
 | **Unique Users** | 19,059 | ✅ Diverse User Base |
 | **Data Quality Score** | 70% | ✅ Production Ready |
 | **Processing Time** | 40 seconds | ✅ Highly Optimized |
@@ -91,7 +91,7 @@ python check_data_status.py
 📥 Kaggle API → 🧹 Data Cleaning → 🗄️ SQLite Database → 📊 Quality Reports
      ↓               ↓                    ↓                ↓
  Raw Reviews    20K Processed      7 Optimized        Business
- (Electronics)   Reviews           Tables             Insights
+ (Food & Beverage)   Reviews           Tables             Insights
 ```
 
 ### **Database Schema (7 Tables)**

@@ -1,6 +1,6 @@
 """
 Data Loader Module for Product Review Intelligence System
-Handles loading Amazon reviews dataset from Kaggle and other data sources
+Handles loading Amazon Fine Food Reviews dataset from Kaggle and other data sources
 """
 
 import pandas as pd
@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 class DataLoader:
     """
-    Handles loading and initial processing of review datasets
+    Handles loading and initial processing of Amazon Fine Food Reviews datasets
     """
     
     def __init__(self):
@@ -32,8 +32,8 @@ class DataLoader:
         self.data_dir.mkdir(exist_ok=True)
         self.db_path = DATABASE_URL.replace('sqlite:///', '')
         
-        # Kaggle dataset info
-        self.kaggle_dataset = "snap/amazon-fine-food-reviews"  # Example dataset
+        # Kaggle dataset info - Amazon Fine Food Reviews
+        self.kaggle_dataset = "snap/amazon-fine-food-reviews"
         self.dataset_file = "Reviews.csv"
         
     def setup_kaggle_api(self) -> bool:
@@ -69,7 +69,7 @@ class DataLoader:
     
     def download_kaggle_dataset(self, dataset_name: str = None) -> bool:
         """
-        Download dataset from Kaggle
+        Download Amazon Fine Food Reviews dataset from Kaggle
         """
         if not dataset_name:
             dataset_name = self.kaggle_dataset
@@ -77,7 +77,7 @@ class DataLoader:
         try:
             import kaggle
             
-            logger.info(f"Downloading dataset: {dataset_name}")
+            logger.info(f"Downloading Amazon Fine Food Reviews dataset: {dataset_name}")
             
             # Download to data directory
             kaggle.api.dataset_download_files(
@@ -86,7 +86,7 @@ class DataLoader:
                 unzip=True
             )
             
-            logger.info(f"Dataset downloaded to: {self.data_dir}")
+            logger.info(f"Amazon Fine Food Reviews dataset downloaded to: {self.data_dir}")
             return True
             
         except Exception as e:
@@ -121,10 +121,10 @@ class DataLoader:
     
     def load_amazon_reviews(self, sample_size: int = 50000) -> pd.DataFrame:
         """
-        Load Amazon reviews dataset with standardized column names
+        Load Amazon Fine Food Reviews dataset with standardized column names
         """
         try:
-            # Try multiple possible filenames
+            # Try multiple possible filenames for Amazon Fine Food Reviews
             possible_files = [
                 "Reviews.csv",
                 "amazon_reviews.csv", 
@@ -141,9 +141,9 @@ class DataLoader:
                     continue
             
             if df is None:
-                raise FileNotFoundError("No Amazon reviews dataset found")
+                raise FileNotFoundError("No Amazon Fine Food Reviews dataset found")
             
-            # Standardize column names
+            # Standardize column names for food reviews
             df = self._standardize_amazon_columns(df)
             
             # Basic validation
@@ -153,20 +153,20 @@ class DataLoader:
             if missing_cols:
                 logger.warning(f"Missing columns: {missing_cols}")
             
-            logger.info(f"Amazon reviews loaded: {len(df)} rows")
+            logger.info(f"Amazon Fine Food Reviews loaded: {len(df)} rows")
             logger.info(f"Columns: {list(df.columns)}")
             
             return df
             
         except Exception as e:
-            logger.error(f"Failed to load Amazon reviews: {e}")
+            logger.error(f"Failed to load Amazon Fine Food Reviews: {e}")
             raise
     
     def _standardize_amazon_columns(self, df: pd.DataFrame) -> pd.DataFrame:
         """
-        Standardize column names across different Amazon review datasets
+        Standardize column names across different Amazon Fine Food Reviews datasets
         """
-        # Common column mappings
+        # Common column mappings for Amazon Fine Food Reviews
         column_mappings = {
             'ProductId': 'product_id',
             'UserId': 'user_id', 
@@ -219,7 +219,7 @@ class DataLoader:
             'product_id': lambda: df.index.astype(str),
             'user_id': lambda: df.index.astype(str), 
             'rating': lambda: np.random.randint(1, 6, len(df)),
-            'review_text': lambda: ['Sample review'] * len(df)
+            'review_text': lambda: ['Sample food review'] * len(df)
         }
         
         for col, default_func in required_defaults.items():
@@ -245,39 +245,66 @@ class DataLoader:
     
     def load_sample_dataset(self) -> pd.DataFrame:
         """
-        Load a sample dataset for testing (creates synthetic data if no real data available)
+        Load a sample dataset for testing (creates synthetic food data if no real data available)
         """
         try:
-            # Try to load real dataset first
+            # Try to load real Amazon Fine Food Reviews dataset first
             return self.load_amazon_reviews(sample_size=1000)
             
         except Exception as e:
             logger.warning(f"Real dataset not available: {e}")
-            logger.info("Creating synthetic sample dataset")
+            logger.info("Creating synthetic sample food dataset")
             
-            # Create synthetic data for testing
+            # Create synthetic food data for testing
             np.random.seed(42)
             n_samples = 1000
             
+            # Food-specific product IDs and names
+            food_products = [
+                'B000E7L2R4', 'B00I5F7N9K', 'B0002IY5ZY', 'B000EMJHGY',
+                'B007JBXKFW', 'B003GTR8IO', 'B00C7J5084', 'B004U49QU2',
+                'B000E63LRO', 'B000LKTTTW', 'B000H25SOU', 'B004RF6TT0'
+            ]
+            
+            # Food-specific review examples
+            food_review_templates = [
+                'This {food_type} has great taste and arrived fresh.',
+                'Excellent {food_type}! Perfect for my {meal_type}.',
+                'Good quality {food_type} but a bit expensive.',
+                'Love this {food_type}! Will definitely order again.',
+                'The {food_type} was stale when it arrived.',
+                'Amazing flavor! This {food_type} exceeded my expectations.',
+                'Not bad {food_type} but I\'ve had better.',
+                'Perfect {food_type} for cooking and baking.'
+            ]
+            
+            food_types = ['snack', 'beverage', 'condiment', 'ingredient', 'treat', 'sauce']
+            meal_types = ['breakfast', 'lunch', 'dinner', 'snacking', 'cooking']
+            
             synthetic_data = {
-                'product_id': [f'B{str(i).zfill(8)}' for i in range(n_samples)],
+                'product_id': np.random.choice(food_products, n_samples),
                 'user_id': [f'U{str(i).zfill(6)}' for i in np.random.randint(0, 100, n_samples)],
                 'rating': np.random.choice([1, 2, 3, 4, 5], n_samples, p=[0.1, 0.1, 0.2, 0.3, 0.3]),
-                'review_text': [f'Sample review text {i}' for i in range(n_samples)],
-                'review_title': [f'Review title {i}' for i in range(n_samples)],
+                'review_text': [
+                    np.random.choice(food_review_templates).format(
+                        food_type=np.random.choice(food_types),
+                        meal_type=np.random.choice(meal_types)
+                    ) for _ in range(n_samples)
+                ],
+                'review_title': [f'Food review {i}' for i in range(n_samples)],
                 'date': pd.date_range('2020-01-01', periods=n_samples, freq='D'),
                 'helpful_votes': np.random.randint(0, 10, n_samples),
                 'total_votes': np.random.randint(0, 15, n_samples)
             }
             
             df = pd.DataFrame(synthetic_data)
-            logger.info(f"Created synthetic dataset: {len(df)} rows")
+            logger.info(f"Created synthetic food dataset: {len(df)} rows")
             
             return df
     
     def get_dataset_info(self, df: pd.DataFrame) -> Dict:
         """
-        Get comprehensive information about loaded dataset
+        Get comprehensive information about loaded Amazon Fine Food Reviews dataset
         """
         info = {
             'total_rows': len(df),
@@ -291,14 +318,15 @@ class DataLoader:
             'rating_distribution': df['rating'].value_counts().to_dict() if 'rating' in df.columns else {},
             'missing_values': df.isnull().sum().to_dict(),
             'unique_products': df['product_id'].nunique() if 'product_id' in df.columns else 0,
-            'unique_users': df['user_id'].nunique() if 'user_id' in df.columns else 0
+            'unique_users': df['user_id'].nunique() if 'user_id' in df.columns else 0,
+            'dataset_type': 'Amazon Fine Food Reviews'
         }
         
         return info
     
-    def export_dataset_summary(self, df: pd.DataFrame, output_file: str = 'dataset_summary.json'):
+    def export_dataset_summary(self, df: pd.DataFrame, output_file: str = 'food_dataset_summary.json'):
         """
-        Export dataset summary to JSON file
+        Export Amazon Fine Food Reviews dataset summary to JSON file
         """
         try:
             info = self.get_dataset_info(df)
@@ -313,7 +341,7 @@ class DataLoader:
             with open(output_path, 'w') as f:
                 json.dump(info, f, indent=2)
             
-            logger.info(f"Dataset summary exported to: {output_path}")
+            logger.info(f"Food dataset summary exported to: {output_path}")
             
         except Exception as e:
             logger.error(f"Failed to export dataset summary: {e}")
@@ -321,14 +349,14 @@ class DataLoader:
 
 def main():
     """
-    Main function for testing data loader
+    Main function for testing data loader with Amazon Fine Food Reviews
     """
     loader = DataLoader()
     
     try:
         # Setup Kaggle API
         if loader.setup_kaggle_api():
-            # Try to download real dataset
+            # Try to download real Amazon Fine Food Reviews dataset
             if loader.download_kaggle_dataset():
                 df = loader.load_amazon_reviews(sample_size=5000)
             else:
@@ -338,7 +366,7 @@ def main():
         
         # Display dataset info
         info = loader.get_dataset_info(df)
-        print("\n=== Dataset Information ===")
+        print("\n=== Amazon Fine Food Reviews Dataset Information ===")
         for key, value in info.items():
             print(f"{key}: {value}")
         
@@ -349,7 +377,7 @@ def main():
         sample_df = df.head(100)
         loader.save_to_database(sample_df, 'reviews')
         
-        print(f"\nSuccess! Loaded {len(df)} reviews")
+        print(f"\nSuccess! Loaded {len(df)} food reviews")
         
     except Exception as e:
         logger.error(f"Main execution failed: {e}")

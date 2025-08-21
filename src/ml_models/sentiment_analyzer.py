@@ -1,6 +1,7 @@
 """
 Sentiment Analysis System using Hugging Face Transformers and OpenAI API
 Handles overall sentiment + aspect-based sentiment analysis
+Specialized for Amazon Fine Food Reviews
 """
 
 import os
@@ -41,7 +42,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('logs/sentiment_analysis.log', encoding='utf-8'),
+        logging.FileHandler('logs/food_sentiment_analysis.log', encoding='utf-8'),
         logging.StreamHandler()
     ]
 )
@@ -58,15 +59,16 @@ class SentimentResult:
 
 class SentimentAnalyzer:
     """
-    Advanced sentiment analysis system combining Hugging Face transformers
-    with OpenAI API for aspect-based sentiment analysis
+    Advanced sentiment analysis system for Amazon Fine Food Reviews
+    combining Hugging Face transformers with OpenAI API for aspect-based sentiment analysis
     """
     
     def __init__(self, db_path: str = "./database/review_intelligence.db"):
         self.db_path = db_path
         self.openai_client = None
         self.hf_sentiment_pipeline = None
-        self.aspects = ["price", "quality", "shipping", "service", "packaging", "value"]
+        # Food-specific aspects for Amazon Fine Food Reviews
+        self.aspects = ["taste", "flavor", "quality", "freshness", "price", "packaging", "shipping", "texture", "ingredients", "value"]
         
         # Initialize OpenAI client if API key is available
         self._setup_openai()
@@ -74,7 +76,7 @@ class SentimentAnalyzer:
         # Initialize Hugging Face pipeline
         self._setup_huggingface()
         
-        logger.info("SUCCESS: SentimentAnalyzer initialized successfully")
+        logger.info("SUCCESS: SentimentAnalyzer initialized successfully for Amazon Fine Food Reviews")
     
     def _setup_openai(self):
         """Setup OpenAI client with API key validation"""
@@ -93,7 +95,7 @@ class SentimentAnalyzer:
                 )
                 logger.info("SUCCESS: OpenAI API connected successfully")
             else:
-                logger.warning("WARNING: OpenAI API key not found. Aspect analysis will use rule-based approach.")
+                logger.warning("WARNING: OpenAI API key not found. Food aspect analysis will use rule-based approach.")
                 
         except Exception as e:
             logger.error(f"ERROR: OpenAI setup failed: {e}")
@@ -117,14 +119,14 @@ class SentimentAnalyzer:
                 max_length=512
             )
             
-            logger.info("SUCCESS: Hugging Face pipeline loaded successfully")
+            logger.info("SUCCESS: Hugging Face pipeline loaded successfully for food reviews")
             
         except Exception as e:
             logger.error(f"ERROR: Hugging Face setup failed: {e}")
             # Fallback to default sentiment pipeline
             try:
                 self.hf_sentiment_pipeline = pipeline("sentiment-analysis")
-                logger.info("SUCCESS: Fallback sentiment pipeline loaded")
+                logger.info("SUCCESS: Fallback sentiment pipeline loaded for food reviews")
             except Exception as e2:
                 logger.error(f"ERROR: Fallback pipeline also failed: {e2}")
                 raise Exception("Could not initialize any sentiment analysis pipeline")
@@ -164,26 +166,26 @@ class SentimentAnalyzer:
     
     def extract_aspects_openai(self, text: str) -> Dict[str, Dict[str, float]]:
         """
-        Extract aspect-based sentiment using OpenAI API
+        Extract aspect-based sentiment for food reviews using OpenAI API
         Returns: {aspect: {sentiment: score, confidence: float}}
         """
         if not self.openai_client:
-            return self._extract_aspects_rule_based(text)
+            return self._extract_food_aspects_rule_based(text)
         
         try:
             prompt = f"""
-            Analyze this product review for sentiment about specific aspects.
+            Analyze this food product review for sentiment about specific aspects.
             
             Review: "{text}"
             
-            For each aspect mentioned, rate the sentiment from 1-5 (1=very negative, 3=neutral, 5=very positive).
+            For each food aspect mentioned, rate the sentiment from 1-5 (1=very negative, 3=neutral, 5=very positive).
             Only include aspects that are clearly mentioned or implied.
             
-            Aspects to consider: price, quality, shipping, service, packaging, value
+            Food aspects to consider: taste, flavor, quality, freshness, price, packaging, shipping, texture, ingredients, value
             
             Return JSON format:
             {{
-                "price": {{"sentiment": 4, "confidence": 0.8}},
+                "taste": {{"sentiment": 4, "confidence": 0.8}},
                 "quality": {{"sentiment": 5, "confidence": 0.9}}
             }}
             
@@ -209,34 +211,38 @@ class SentimentAnalyzer:
                 return aspects_data
             else:
                 logger.warning("Could not parse JSON from OpenAI response")
-                return self._extract_aspects_rule_based(text)
+                return self._extract_food_aspects_rule_based(text)
                 
         except Exception as e:
-            logger.error(f"ERROR: OpenAI aspect extraction failed: {e}")
-            return self._extract_aspects_rule_based(text)
+            logger.error(f"ERROR: OpenAI food aspect extraction failed: {e}")
+            return self._extract_food_aspects_rule_based(text)
     
-    def _extract_aspects_rule_based(self, text: str) -> Dict[str, Dict[str, float]]:
+    def _extract_food_aspects_rule_based(self, text: str) -> Dict[str, Dict[str, float]]:
         """
-        Fallback rule-based aspect extraction
+        Fallback rule-based aspect extraction for food reviews
         """
         text_lower = text.lower()
         aspects_found = {}
         
-        # Keywords for each aspect
-        aspect_keywords = {
-            "price": ["price", "cost", "expensive", "cheap", "value", "money", "dollar", "affordable"],
-            "quality": ["quality", "build", "material", "durable", "sturdy", "flimsy", "solid"],
-            "shipping": ["shipping", "delivery", "arrived", "fast", "slow", "quick", "package"],
-            "service": ["service", "support", "help", "staff", "customer", "response"],
-            "packaging": ["packaging", "box", "wrapped", "protected", "damaged", "secure"],
-            "value": ["worth", "value", "recommend", "satisfied", "happy", "disappointed"]
+        # Keywords for each food aspect
+        food_aspect_keywords = {
+            "taste": ["taste", "tastes", "tasted", "tasty", "flavorful", "delicious", "yummy", "bland", "bitter", "sweet", "sour", "salty"],
+            "flavor": ["flavor", "flavour", "flavored", "flavoring", "spicy", "mild", "rich", "bold", "subtle", "intense"],
+            "quality": ["quality", "fresh", "stale", "expired", "premium", "cheap", "high-quality", "low-quality", "excellent", "poor"],
+            "freshness": ["fresh", "freshness", "stale", "expired", "spoiled", "crisp", "soggy", "moldy", "rotten"],
+            "price": ["price", "cost", "expensive", "cheap", "value", "money", "dollar", "affordable", "overpriced", "budget"],
+            "packaging": ["packaging", "package", "wrapped", "container", "box", "bag", "sealed", "damaged", "broken", "secure"],
+            "shipping": ["shipping", "delivery", "arrived", "fast", "slow", "quick", "delayed", "prompt", "timely"],
+            "texture": ["texture", "smooth", "rough", "creamy", "crunchy", "soft", "hard", "chewy", "tender", "tough"],
+            "ingredients": ["ingredients", "natural", "organic", "artificial", "preservatives", "additives", "pure", "healthy", "nutritious"],
+            "value": ["value", "worth", "recommend", "satisfied", "happy", "disappointed", "good deal", "waste of money"]
         }
         
-        # Simple sentiment words
-        positive_words = ["good", "great", "excellent", "amazing", "perfect", "love", "awesome", "fantastic"]
-        negative_words = ["bad", "terrible", "awful", "hate", "horrible", "worst", "disappointed", "poor"]
+        # Food-specific sentiment words
+        positive_words = ["delicious", "tasty", "fresh", "flavorful", "amazing", "excellent", "perfect", "love", "great", "wonderful", "satisfying"]
+        negative_words = ["stale", "bland", "awful", "terrible", "spoiled", "expired", "disgusting", "horrible", "tasteless", "disappointing", "inedible"]
         
-        for aspect, keywords in aspect_keywords.items():
+        for aspect, keywords in food_aspect_keywords.items():
             # Check if aspect is mentioned
             if any(keyword in text_lower for keyword in keywords):
                 # Simple sentiment calculation
@@ -284,7 +290,7 @@ class SentimentAnalyzer:
     
     def analyze_review(self, review_text: str) -> SentimentResult:
         """
-        Complete sentiment analysis for a single review
+        Complete sentiment analysis for a single food review
         """
         start_time = time.time()
         
@@ -293,7 +299,7 @@ class SentimentAnalyzer:
             sentiment, confidence = self.analyze_sentiment_hf(review_text)
             score = self.sentiment_score_to_rating(sentiment, confidence)
             
-            # Aspect-based sentiment analysis
+            # Food aspect-based sentiment analysis
             aspects = self.extract_aspects_openai(review_text)
             
             processing_time = time.time() - start_time
@@ -307,7 +313,7 @@ class SentimentAnalyzer:
             )
             
         except Exception as e:
-            logger.error(f"ERROR: Review analysis failed: {e}")
+            logger.error(f"ERROR: Food review analysis failed: {e}")
             processing_time = time.time() - start_time
             
             return SentimentResult(
@@ -320,9 +326,9 @@ class SentimentAnalyzer:
     
     def batch_analyze_reviews(self, review_ids: List[int] = None, limit: int = 500) -> List[Dict]:
         """
-        Batch process reviews from database
+        Batch process food reviews from database
         """
-        logger.info(f"STARTING: Batch sentiment analysis (limit: {limit})")
+        logger.info(f"STARTING: Batch sentiment analysis for food reviews (limit: {limit})")
         
         # Connect to database
         conn = sqlite3.connect(self.db_path)
@@ -332,7 +338,7 @@ class SentimentAnalyzer:
         cursor.execute("PRAGMA table_info(reviews)")
         columns_info = cursor.fetchall()
         available_columns = [col[1] for col in columns_info]
-        logger.info(f"Available columns in reviews table: {available_columns}")
+        logger.info(f"Available columns in food reviews table: {available_columns}")
         
         # Determine the correct column names
         id_column = None
@@ -355,9 +361,9 @@ class SentimentAnalyzer:
             conn.close()
             return []
         
-        logger.info(f"Using columns: ID='{id_column}', TEXT='{text_column}'")
+        logger.info(f"Using columns for food reviews: ID='{id_column}', TEXT='{text_column}'")
         
-        # Query reviews with correct column names
+        # Query food reviews with correct column names
         if review_ids:
             placeholders = ','.join(['?' for _ in review_ids])
             query = f"SELECT {id_column}, {text_column} FROM reviews WHERE {id_column} IN ({placeholders})"
@@ -371,7 +377,7 @@ class SentimentAnalyzer:
         # Rename columns to standard names for processing
         df = df.rename(columns={id_column: 'id', text_column: 'review_text'})
         
-        logger.info(f"PROCESSING: {len(df)} reviews...")
+        logger.info(f"PROCESSING: {len(df)} food reviews...")
         
         results = []
         start_time = time.time()
@@ -398,14 +404,14 @@ class SentimentAnalyzer:
                     elapsed = time.time() - start_time
                     rate = (idx + 1) / elapsed
                     eta = (len(df) - idx - 1) / rate if rate > 0 else 0
-                    logger.info(f"PROGRESS: Processed {idx + 1}/{len(df)} reviews | Rate: {rate:.1f}/sec | ETA: {eta:.0f}s")
+                    logger.info(f"PROGRESS: Processed {idx + 1}/{len(df)} food reviews | Rate: {rate:.1f}/sec | ETA: {eta:.0f}s")
                 
             except Exception as e:
-                logger.error(f"ERROR: Failed to process review {row['id']}: {e}")
+                logger.error(f"ERROR: Failed to process food review {row['id']}: {e}")
                 continue
         
         total_time = time.time() - start_time
-        logger.info(f"COMPLETE: Batch analysis complete: {len(results)} reviews in {total_time:.1f}s")
+        logger.info(f"COMPLETE: Food reviews batch analysis complete: {len(results)} reviews in {total_time:.1f}s")
         
         return results
     
@@ -414,10 +420,10 @@ class SentimentAnalyzer:
         Save sentiment analysis results to database
         """
         if not results:
-            logger.warning("WARNING: No results to save")
+            logger.warning("WARNING: No food sentiment results to save")
             return
         
-        logger.info(f"SAVING: {len(results)} sentiment results to database...")
+        logger.info(f"SAVING: {len(results)} food sentiment results to database...")
         
         try:
             conn = sqlite3.connect(self.db_path)
@@ -457,15 +463,15 @@ class SentimentAnalyzer:
             conn.commit()
             conn.close()
             
-            logger.info("SUCCESS: Sentiment results saved successfully")
+            logger.info("SUCCESS: Food sentiment results saved successfully")
             
         except Exception as e:
-            logger.error(f"ERROR: Failed to save sentiment results: {e}")
+            logger.error(f"ERROR: Failed to save food sentiment results: {e}")
             raise
     
     def get_sentiment_stats(self) -> Dict:
         """
-        Get sentiment analysis statistics from database
+        Get sentiment analysis statistics from database for food reviews
         """
         try:
             conn = sqlite3.connect(self.db_path)
@@ -485,7 +491,7 @@ class SentimentAnalyzer:
             
             stats = pd.read_sql_query(stats_query, conn).iloc[0].to_dict()
             
-            # Aspect statistics
+            # Food aspect statistics
             aspect_query = """
                 SELECT aspects_json 
                 FROM sentiment_analysis 
@@ -494,7 +500,7 @@ class SentimentAnalyzer:
             
             aspect_data = pd.read_sql_query(aspect_query, conn)
             
-            # Parse aspects and calculate averages
+            # Parse food aspects and calculate averages
             aspect_stats = {}
             for _, row in aspect_data.iterrows():
                 try:
@@ -506,7 +512,7 @@ class SentimentAnalyzer:
                 except:
                     continue
             
-            # Calculate aspect averages
+            # Calculate food aspect averages
             for aspect in aspect_stats:
                 aspect_stats[aspect] = {
                     'avg_sentiment': np.mean(aspect_stats[aspect]),
@@ -517,56 +523,57 @@ class SentimentAnalyzer:
             
             return {
                 'overall_stats': stats,
-                'aspect_stats': aspect_stats,
-                'timestamp': datetime.now().isoformat()
+                'food_aspect_stats': aspect_stats,
+                'timestamp': datetime.now().isoformat(),
+                'dataset_type': 'Amazon Fine Food Reviews'
             }
             
         except Exception as e:
-            logger.error(f"ERROR: Failed to get sentiment stats: {e}")
+            logger.error(f"ERROR: Failed to get food sentiment stats: {e}")
             return {}
 
 def main():
     """
-    Main function for testing sentiment analysis
+    Main function for testing sentiment analysis on food reviews
     """
-    print("TESTING: Sentiment Analysis System")
+    print("TESTING: Sentiment Analysis System for Amazon Fine Food Reviews")
     print("=" * 50)
     
     # Initialize analyzer
     analyzer = SentimentAnalyzer()
     
-    # Test single review
-    test_review = """
-    This product is absolutely amazing! The quality is outstanding and the price is very reasonable. 
-    The shipping was incredibly fast - arrived in just 2 days. Customer service was also very helpful 
-    when I had questions. The packaging was secure and everything arrived in perfect condition. 
-    I would definitely recommend this to anyone looking for great value!
+    # Test single food review
+    test_food_review = """
+    This coffee is absolutely amazing! The flavor is rich and bold, exactly what I was looking for. 
+    The beans taste fresh and the aroma is incredible. The price is very reasonable for such high quality. 
+    The packaging was secure and everything arrived quickly in perfect condition. 
+    The taste is smooth with no bitter aftertaste. I would definitely recommend this to any coffee lover!
     """
     
-    print("\nTESTING: Single review analysis...")
-    result = analyzer.analyze_review(test_review)
+    print("\nTESTING: Single food review analysis...")
+    result = analyzer.analyze_review(test_food_review)
     
     print(f"Overall Sentiment: {result.overall_sentiment}")
     print(f"Confidence: {result.confidence:.3f}")
     print(f"Score (1-5): {result.score:.2f}")
     print(f"Processing Time: {result.processing_time:.3f}s")
-    print("\nAspect Analysis:")
+    print("\nFood Aspect Analysis:")
     for aspect, data in result.aspects.items():
         print(f"  {aspect}: {data['sentiment']:.2f} (confidence: {data['confidence']:.2f})")
     
     # Test batch processing
-    print("\nTESTING: Batch processing (first 100 reviews)...")
+    print("\nTESTING: Batch processing (first 100 food reviews)...")
     batch_results = analyzer.batch_analyze_reviews(limit=100)
     
     if batch_results:
-        print(f"SUCCESS: Successfully processed {len(batch_results)} reviews")
+        print(f"SUCCESS: Successfully processed {len(batch_results)} food reviews")
         
         # Save results
         analyzer.save_sentiment_results(batch_results)
         
         # Get statistics
         stats = analyzer.get_sentiment_stats()
-        print("\nSTATISTICS: Analysis Statistics:")
+        print("\nSTATISTICS: Food Review Analysis Statistics:")
         print(f"Total Analyzed: {stats['overall_stats']['total_analyzed']}")
         print(f"Average Confidence: {stats['overall_stats']['avg_confidence']:.3f}")
         print(f"Average Sentiment Score: {stats['overall_stats']['avg_sentiment_score']:.2f}")
@@ -574,13 +581,13 @@ def main():
         print(f"Negative Reviews: {stats['overall_stats']['negative_count']}")
         print(f"Neutral Reviews: {stats['overall_stats']['neutral_count']}")
         
-        if stats['aspect_stats']:
-            print("\nTop Aspects:")
-            for aspect, data in sorted(stats['aspect_stats'].items(), 
+        if stats['food_aspect_stats']:
+            print("\nTop Food Aspects:")
+            for aspect, data in sorted(stats['food_aspect_stats'].items(), 
                                      key=lambda x: x[1]['count'], reverse=True)[:5]:
                 print(f"  {aspect}: {data['avg_sentiment']:.2f} ({data['count']} mentions)")
     
-    print("\nCOMPLETE: Sentiment Analysis System test complete!")
+    print("\nCOMPLETE: Food Review Sentiment Analysis System test complete!")
 
 if __name__ == "__main__":
     main()

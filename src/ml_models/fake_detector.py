@@ -1,6 +1,7 @@
 """
 Fake Review Detection System using Traditional ML
 Uses features from review text, user behavior, and sentiment patterns
+Specialized for Amazon Fine Food Reviews
 """
 
 import os
@@ -51,7 +52,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('logs/fake_detection.log', encoding='utf-8'),
+        logging.FileHandler('logs/food_fake_detection.log', encoding='utf-8'),
         logging.StreamHandler()
     ]
 )
@@ -69,6 +70,7 @@ class FakeDetectionResult:
 class FakeReviewDetector:
     """
     Advanced fake review detection using traditional ML features
+    Specialized for Amazon Fine Food Reviews
     """
     
     def __init__(self, db_path: str = "./database/review_intelligence.db"):
@@ -84,43 +86,49 @@ class FakeReviewDetector:
         self.feature_names = []
         self.sia = SentimentIntensityAnalyzer()
         
-        # Fake review patterns and keywords
-        self.fake_patterns = self._initialize_fake_patterns()
+        # Fake review patterns and keywords for food reviews
+        self.fake_patterns = self._initialize_food_fake_patterns()
         
-        logger.info("SUCCESS: FakeReviewDetector initialized successfully")
+        logger.info("SUCCESS: FakeReviewDetector initialized successfully for Amazon Fine Food Reviews")
     
-    def _initialize_fake_patterns(self) -> Dict:
-        """Initialize patterns commonly found in fake reviews"""
+    def _initialize_food_fake_patterns(self) -> Dict:
+        """Initialize patterns commonly found in fake food reviews"""
         return {
-            'generic_phrases': [
-                'great product', 'highly recommend', 'amazing quality',
-                'fast shipping', 'excellent service', 'love this product',
-                'worth the money', 'perfect item', 'good value'
+            'generic_food_phrases': [
+                'great taste', 'amazing flavor', 'delicious food', 'highly recommend',
+                'fresh ingredients', 'excellent quality', 'love this product',
+                'worth the money', 'perfect snack', 'good value', 'tasty treat'
             ],
             'spam_indicators': [
                 'buy now', 'click here', 'visit my', 'check out',
-                'follow me', 'discount code', 'free shipping'
+                'follow me', 'discount code', 'free shipping', 'limited time'
             ],
             'excessive_punctuation': [
                 '!!!', '???', '!!', '...', '***'
             ],
-            'competitor_keywords': [
-                'better than', 'compared to', 'unlike other',
-                'worst product', 'dont buy', 'terrible quality'
+            'competitor_food_keywords': [
+                'better than', 'compared to', 'unlike other brands',
+                'worst food', 'dont buy', 'terrible taste', 'overpriced food',
+                'much better brands', 'competitor tastes better'
+            ],
+            'food_specific_spam': [
+                'changed my life', 'best food ever', 'amazing amazing',
+                'perfect perfect', 'love love love', 'yummy yummy',
+                'so good so good', 'fresh fresh fresh'
             ]
         }
     
     def extract_text_features(self, review_text: str) -> Dict[str, float]:
         """
-        Extract text-based features for fake detection
+        Extract text-based features for fake detection in food reviews
         """
         if not review_text or pd.isna(review_text):
             return {f'text_{key}': 0.0 for key in [
                 'length', 'word_count', 'sentence_count', 'avg_word_length',
                 'caps_ratio', 'punct_ratio', 'exclamation_ratio',
-                'generic_phrase_count', 'spam_indicator_count',
+                'generic_food_phrase_count', 'spam_indicator_count',
                 'excessive_punct_count', 'competitor_keyword_count',
-                'sentiment_compound', 'sentiment_extreme'
+                'food_spam_count', 'sentiment_compound', 'sentiment_extreme'
             ]}
         
         text = str(review_text).lower()
@@ -144,11 +152,12 @@ class FakeReviewDetector:
         
         avg_word_length = np.mean([len(word) for word in words]) if words else 0
         
-        # Fake review pattern detection
-        generic_phrase_count = sum(1 for phrase in self.fake_patterns['generic_phrases'] if phrase in text)
+        # Fake food review pattern detection
+        generic_food_phrase_count = sum(1 for phrase in self.fake_patterns['generic_food_phrases'] if phrase in text)
         spam_indicator_count = sum(1 for phrase in self.fake_patterns['spam_indicators'] if phrase in text)
         excessive_punct_count = sum(1 for punct in self.fake_patterns['excessive_punctuation'] if punct in text)
-        competitor_keyword_count = sum(1 for phrase in self.fake_patterns['competitor_keywords'] if phrase in text)
+        competitor_keyword_count = sum(1 for phrase in self.fake_patterns['competitor_food_keywords'] if phrase in text)
+        food_spam_count = sum(1 for phrase in self.fake_patterns['food_specific_spam'] if phrase in text)
         
         # Sentiment analysis
         sentiment_scores = self.sia.polarity_scores(text)
@@ -163,10 +172,11 @@ class FakeReviewDetector:
             'text_caps_ratio': caps_ratio,
             'text_punct_ratio': punct_ratio,
             'text_exclamation_ratio': exclamation_ratio,
-            'text_generic_phrase_count': generic_phrase_count,
+            'text_generic_food_phrase_count': generic_food_phrase_count,
             'text_spam_indicator_count': spam_indicator_count,
             'text_excessive_punct_count': excessive_punct_count,
             'text_competitor_keyword_count': competitor_keyword_count,
+            'text_food_spam_count': food_spam_count,
             'text_sentiment_compound': sentiment_compound,
             'text_sentiment_extreme': sentiment_extreme
         }
@@ -200,7 +210,7 @@ class FakeReviewDetector:
     def extract_all_features(self, review_text: str, user_data: Dict = None, 
                            review_data: Dict = None) -> Dict[str, float]:
         """
-        Extract comprehensive feature set for fake detection
+        Extract comprehensive feature set for fake detection in food reviews
         """
         features = {}
         
@@ -220,24 +230,24 @@ class FakeReviewDetector:
     
     def prepare_training_data(self, limit: int = 2000) -> Tuple[pd.DataFrame, pd.Series]:
         """
-        Prepare training data from real reviews and synthetic fake reviews
+        Prepare training data from real food reviews and synthetic fake reviews
         """
-        logger.info(f"PREPARING: Training data (limit: {limit})")
+        logger.info(f"PREPARING: Training data for food reviews (limit: {limit})")
         
         conn = sqlite3.connect(self.db_path)
         
-        # Get real reviews (labeled as authentic)
+        # Get real food reviews (labeled as authentic)
         real_reviews_query = """
-            SELECT r.Id, r.review_text, r.rating, r.helpful_votes, r.total_votes,
-                   r.rating_deviation, r.user_id, r.product_id
-            FROM reviews r
+            SELECT Id, review_text, rating, helpful_votes, total_votes,
+                   rating_deviation, user_id, product_id
+            FROM reviews
             ORDER BY RANDOM()
             LIMIT ?
         """
         real_reviews = pd.read_sql_query(real_reviews_query, conn, params=[limit//2])
         real_reviews['is_fake'] = 0
         
-        # Try to get synthetic fake reviews
+        # Try to get synthetic fake food reviews
         try:
             fake_reviews_query = """
                 SELECT review_text, rating, 0 as helpful_votes, 0 as total_votes,
@@ -250,23 +260,23 @@ class FakeReviewDetector:
             fake_reviews = pd.read_sql_query(fake_reviews_query, conn, params=[limit//2])
             fake_reviews['is_fake'] = 1
             
-            logger.info(f"SUCCESS: Found {len(fake_reviews)} synthetic fake reviews")
+            logger.info(f"SUCCESS: Found {len(fake_reviews)} synthetic fake food reviews")
             
         except Exception as e:
-            logger.warning(f"WARNING: Could not load synthetic reviews: {e}")
-            # Create some artificial fake reviews for training
-            fake_reviews = self._create_artificial_fake_reviews(limit//2)
+            logger.warning(f"WARNING: Could not load synthetic food reviews: {e}")
+            # Create some artificial fake food reviews for training
+            fake_reviews = self._create_artificial_fake_food_reviews(limit//2)
         
         conn.close()
         
         # Combine datasets
         all_reviews = pd.concat([real_reviews, fake_reviews], ignore_index=True)
         
-        # Extract features for each review
+        # Extract features for each food review
         feature_list = []
         labels = []
         
-        logger.info(f"EXTRACTING: Features from {len(all_reviews)} reviews...")
+        logger.info(f"EXTRACTING: Features from {len(all_reviews)} food reviews...")
         
         for idx, row in all_reviews.iterrows():
             try:
@@ -296,10 +306,10 @@ class FakeReviewDetector:
                 labels.append(row['is_fake'])
                 
                 if (idx + 1) % 200 == 0:
-                    logger.info(f"PROGRESS: Processed {idx + 1}/{len(all_reviews)} reviews")
+                    logger.info(f"PROGRESS: Processed {idx + 1}/{len(all_reviews)} food reviews")
                     
             except Exception as e:
-                logger.error(f"ERROR: Failed to process review {idx}: {e}")
+                logger.error(f"ERROR: Failed to process food review {idx}: {e}")
                 continue
         
         # Convert to DataFrame
@@ -309,37 +319,39 @@ class FakeReviewDetector:
         # Handle missing values
         features_df = features_df.fillna(0)
         
-        logger.info(f"SUCCESS: Prepared {len(features_df)} samples with {len(features_df.columns)} features")
+        logger.info(f"SUCCESS: Prepared {len(features_df)} food review samples with {len(features_df.columns)} features")
         return features_df, labels_series
     
-    def _create_artificial_fake_reviews(self, count: int) -> pd.DataFrame:
+    def _create_artificial_fake_food_reviews(self, count: int) -> pd.DataFrame:
         """
-        Create artificial fake reviews for training when synthetic data is not available
+        Create artificial fake food reviews for training when synthetic data is not available
         """
-        logger.info(f"CREATING: {count} artificial fake reviews for training")
+        logger.info(f"CREATING: {count} artificial fake food reviews for training")
         
-        fake_templates = [
-            "Great product! Highly recommend! Amazing quality and fast shipping!",
-            "Perfect item! Love this product! Worth the money! Excellent service!",
+        fake_food_templates = [
+            "Great food! Highly recommend! Amazing taste and fast shipping!",
+            "Perfect snack! Love this product! Worth the money! Excellent flavor!",
             "Best purchase ever! Fantastic quality! Fast delivery! Highly recommended!",
-            "Amazing! Perfect! Great! Excellent! Fantastic! Wonderful! Outstanding!",
-            "This product is the best! Better than any other product! Buy now!",
-            "Terrible product! Worst quality! Don't buy! Save your money!",
-            "Perfect 5 stars! No complaints! Fast shipping! Great price!",
-            "Love it love it love it! Best product ever! Amazing amazing amazing!",
-            "Great product great price great service great shipping great everything!",
-            "Awesome product! Click here for more! Visit my profile! Discount code!"
+            "Amazing! Perfect! Great! Excellent! Fantastic! Wonderful! Outstanding taste!",
+            "This food is the best! Better than any other brand! Buy now!",
+            "Terrible food! Worst quality! Don't buy! Save your money!",
+            "Perfect 5 stars! No complaints! Fast shipping! Great price! Delicious!",
+            "Love it love it love it! Best food ever! Amazing amazing amazing taste!",
+            "Great food great price great service great shipping great everything!",
+            "Awesome product! Click here for more! Visit my profile! Discount code! Yummy!",
+            "Fresh fresh fresh! Tasty tasty! Delicious delicious! Perfect perfect!",
+            "Changed my life completely! Best food investment ever! Amazing flavor!"
         ]
         
         fake_reviews = []
         for i in range(count):
-            template = np.random.choice(fake_templates)
+            template = np.random.choice(fake_food_templates)
             
-            # Add some variation
+            # Add some food-specific variation
             if np.random.random() < 0.3:
                 template += " " + np.random.choice([
-                    "Definitely recommend!", "Buy now!", "Perfect!",
-                    "Amazing quality!", "Fast shipping!", "Great value!"
+                    "Definitely recommend for food lovers!", "Buy now for great taste!", "Perfect flavor!",
+                    "Amazing quality food!", "Fast shipping fresh!", "Great value for taste!"
                 ])
             
             fake_reviews.append({
@@ -349,8 +361,8 @@ class FakeReviewDetector:
                 'helpful_votes': 0,
                 'total_votes': 0,
                 'rating_deviation': np.random.uniform(-2, 2),
-                'user_id': f'fake_user_{i}',
-                'product_id': f'fake_product_{i % 100}',
+                'user_id': f'fake_food_user_{i}',
+                'product_id': f'fake_food_product_{i % 100}',
                 'is_fake': 1
             })
         
@@ -358,9 +370,9 @@ class FakeReviewDetector:
     
     def train_model(self, features_df: pd.DataFrame, labels: pd.Series) -> Dict:
         """
-        Train the fake review detection model
+        Train the fake food review detection model
         """
-        logger.info("TRAINING: Fake review detection model")
+        logger.info("TRAINING: Fake food review detection model")
         
         # Store feature names
         self.feature_names = list(features_df.columns)
@@ -387,7 +399,7 @@ class FakeReviewDetector:
             rf, param_grid, cv=5, scoring='roc_auc', n_jobs=-1, verbose=1
         )
         
-        logger.info("TRAINING: Running hyperparameter optimization...")
+        logger.info("TRAINING: Running hyperparameter optimization for food reviews...")
         grid_search.fit(X_train_scaled, y_train)
         
         self.model = grid_search.best_estimator_
@@ -424,7 +436,7 @@ class FakeReviewDetector:
             'feature_importance': feature_importance.head(10).to_dict('records')
         }
         
-        logger.info(f"SUCCESS: Model trained successfully")
+        logger.info(f"SUCCESS: Food review fake detection model trained successfully")
         logger.info(f"Train Score: {train_score:.3f}")
         logger.info(f"Test Score: {test_score:.3f}")
         logger.info(f"AUC Score: {auc_score:.3f}")
@@ -435,7 +447,7 @@ class FakeReviewDetector:
     def predict_fake_probability(self, review_text: str, user_data: Dict = None, 
                                 review_data: Dict = None) -> FakeDetectionResult:
         """
-        Predict if a review is fake
+        Predict if a food review is fake
         """
         start_time = datetime.now()
         
@@ -484,7 +496,7 @@ class FakeReviewDetector:
             )
             
         except Exception as e:
-            logger.error(f"ERROR: Prediction failed: {e}")
+            logger.error(f"ERROR: Food review prediction failed: {e}")
             processing_time = (datetime.now() - start_time).total_seconds()
             
             return FakeDetectionResult(
@@ -497,17 +509,17 @@ class FakeReviewDetector:
     
     def batch_detect_fake_reviews(self, review_ids: List[int] = None, limit: int = 500) -> List[Dict]:
         """
-        Batch process reviews for fake detection
+        Batch process food reviews for fake detection
         """
         if not self.model:
             raise ValueError("Model not trained. Call train_model() first.")
         
-        logger.info(f"STARTING: Batch fake detection (limit: {limit})")
+        logger.info(f"STARTING: Batch fake detection for food reviews (limit: {limit})")
         
         # Connect to database
         conn = sqlite3.connect(self.db_path)
         
-        # Query reviews
+        # Query food reviews
         if review_ids:
             placeholders = ','.join(['?' for _ in review_ids])
             query = f"SELECT Id, review_text, rating, helpful_votes, total_votes, rating_deviation FROM reviews WHERE Id IN ({placeholders})"
@@ -518,7 +530,7 @@ class FakeReviewDetector:
         
         conn.close()
         
-        logger.info(f"PROCESSING: {len(df)} reviews for fake detection...")
+        logger.info(f"PROCESSING: {len(df)} food reviews for fake detection...")
         
         results = []
         
@@ -548,13 +560,13 @@ class FakeReviewDetector:
                 results.append(result_data)
                 
                 if (idx + 1) % 100 == 0:
-                    logger.info(f"PROGRESS: Processed {idx + 1}/{len(df)} reviews")
+                    logger.info(f"PROGRESS: Processed {idx + 1}/{len(df)} food reviews")
                     
             except Exception as e:
-                logger.error(f"ERROR: Failed to process review {row['Id']}: {e}")
+                logger.error(f"ERROR: Failed to process food review {row['Id']}: {e}")
                 continue
         
-        logger.info(f"COMPLETE: Batch fake detection complete: {len(results)} reviews")
+        logger.info(f"COMPLETE: Batch fake detection complete: {len(results)} food reviews")
         return results
     
     def save_detection_results(self, results: List[Dict]):
@@ -562,10 +574,10 @@ class FakeReviewDetector:
         Save fake detection results to database
         """
         if not results:
-            logger.warning("WARNING: No results to save")
+            logger.warning("WARNING: No food fake detection results to save")
             return
         
-        logger.info(f"SAVING: {len(results)} fake detection results to database...")
+        logger.info(f"SAVING: {len(results)} food fake detection results to database...")
         
         try:
             conn = sqlite3.connect(self.db_path)
@@ -602,13 +614,13 @@ class FakeReviewDetector:
             conn.commit()
             conn.close()
             
-            logger.info("SUCCESS: Fake detection results saved successfully")
+            logger.info("SUCCESS: Food fake detection results saved successfully")
             
         except Exception as e:
-            logger.error(f"ERROR: Failed to save fake detection results: {e}")
+            logger.error(f"ERROR: Failed to save food fake detection results: {e}")
             raise
     
-    def save_model(self, filepath: str = "models/fake_detector.pkl"):
+    def save_model(self, filepath: str = "models/food_fake_detector.pkl"):
         """
         Save the trained model to disk
         """
@@ -625,9 +637,9 @@ class FakeReviewDetector:
         }
         
         joblib.dump(model_data, filepath)
-        logger.info(f"SUCCESS: Model saved to {filepath}")
+        logger.info(f"SUCCESS: Food fake detection model saved to {filepath}")
     
-    def load_model(self, filepath: str = "models/fake_detector.pkl"):
+    def load_model(self, filepath: str = "models/food_fake_detector.pkl"):
         """
         Load a trained model from disk
         """
@@ -641,74 +653,75 @@ class FakeReviewDetector:
         self.feature_names = model_data['feature_names']
         self.fake_patterns = model_data['fake_patterns']
         
-        logger.info(f"SUCCESS: Model loaded from {filepath}")
+        logger.info(f"SUCCESS: Food fake detection model loaded from {filepath}")
 
 def main():
     """
-    Main function for testing fake review detection
+    Main function for testing fake food review detection
     """
-    print("TESTING: Fake Review Detection System")
+    print("TESTING: Fake Review Detection System for Amazon Fine Food Reviews")
     print("=" * 50)
     
     # Initialize detector
     detector = FakeReviewDetector()
     
     # Prepare training data
-    print("\nPREPARING: Training data...")
+    print("\nPREPARING: Training data for food reviews...")
     features_df, labels = detector.prepare_training_data(limit=1000)
     
     print(f"Dataset: {len(features_df)} samples, {len(features_df.columns)} features")
-    print(f"Real reviews: {sum(labels == 0)}, Fake reviews: {sum(labels == 1)}")
+    print(f"Real food reviews: {sum(labels == 0)}, Fake food reviews: {sum(labels == 1)}")
     
     # Train model
-    print("\nTRAINING: Model...")
+    print("\nTRAINING: Model for food reviews...")
     results = detector.train_model(features_df, labels)
     
     print("\nMODEL RESULTS:")
     print(f"AUC Score: {results['auc_score']:.3f}")
     print(f"Cross-validation: {results['cv_mean']:.3f} (+/- {results['cv_std'] * 2:.3f})")
     
-    print("\nTop Important Features:")
+    print("\nTop Important Features for Food Reviews:")
     for feature in results['feature_importance'][:5]:
         print(f"  {feature['feature']}: {feature['importance']:.3f}")
     
     # Test single prediction
-    print("\nTESTING: Single predictions...")
+    print("\nTESTING: Single predictions on food reviews...")
     
-    # Test authentic review
-    authentic_review = """
-    I purchased this coffee maker last month and have been using it daily. 
-    The brewing quality is consistent and the coffee tastes great. 
-    Setup was straightforward and it fits nicely on my counter. 
-    The only minor issue is that the water reservoir could be a bit larger, 
-    but overall I'm satisfied with the purchase and would recommend it to others.
+    # Test authentic food review
+    authentic_food_review = """
+    I ordered this coffee last month and have been enjoying it daily. 
+    The flavor is rich and bold, exactly what I was looking for. The beans 
+    taste fresh and the aroma is wonderful. The packaging kept everything 
+    secure during shipping. The only minor issue is that it's a bit pricey, 
+    but overall I'm satisfied with the taste and would recommend it to other coffee lovers.
     """
     
-    result_authentic = detector.predict_fake_probability(authentic_review)
-    print(f"\nAuthentic Review Test:")
+    result_authentic = detector.predict_fake_probability(authentic_food_review)
+    print(f"\nAuthentic Food Review Test:")
     print(f"  Fake Probability: {result_authentic.is_fake_probability:.3f}")
     print(f"  Risk Level: {result_authentic.risk_level}")
     print(f"  Confidence: {result_authentic.confidence:.3f}")
     
-    # Test suspicious review
-    suspicious_review = """
-    Great product! Amazing quality! Fast shipping! Highly recommend! 
-    Perfect item! Love this product! Worth the money! Excellent service!
-    Best purchase ever! Five stars! Buy now! Amazing amazing amazing!
+    # Test suspicious food review
+    suspicious_food_review = """
+    Great food! Amazing taste! Fast shipping! Highly recommend! 
+    Perfect snack! Love this product! Worth the money! Excellent flavor!
+    Best purchase ever! Five stars! Buy now! Amazing amazing amazing taste!
+    Fresh fresh fresh! Delicious delicious! Perfect perfect perfect!
     """
     
-    result_suspicious = detector.predict_fake_probability(suspicious_review)
-    print(f"\nSuspicious Review Test:")
+    result_suspicious = detector.predict_fake_probability(suspicious_food_review)
+    print(f"\nSuspicious Food Review Test:")
     print(f"  Fake Probability: {result_suspicious.is_fake_probability:.3f}")
     print(f"  Risk Level: {result_suspicious.risk_level}")
     print(f"  Confidence: {result_suspicious.confidence:.3f}")
     
     # Batch processing test
-    print(f"\nTESTING: Batch processing (first 100 reviews)...")
+    print(f"\nTESTING: Batch processing (first 100 food reviews)...")
     batch_results = detector.batch_detect_fake_reviews(limit=100)
     
     if batch_results:
-        print(f"SUCCESS: Processed {len(batch_results)} reviews")
+        print(f"SUCCESS: Processed {len(batch_results)} food reviews")
         
         # Save results
         detector.save_detection_results(batch_results)
@@ -717,17 +730,17 @@ def main():
         fake_probs = [r['fake_probability'] for r in batch_results]
         risk_levels = [r['risk_level'] for r in batch_results]
         
-        print(f"\nFAKE DETECTION STATISTICS:")
+        print(f"\nFAKE DETECTION STATISTICS FOR FOOD REVIEWS:")
         print(f"Average fake probability: {np.mean(fake_probs):.3f}")
         print(f"High risk reviews: {risk_levels.count('HIGH')}")
         print(f"Medium risk reviews: {risk_levels.count('MEDIUM')}")
         print(f"Low risk reviews: {risk_levels.count('LOW')}")
     
     # Save model
-    print(f"\nSAVING: Model...")
+    print(f"\nSAVING: Model for food reviews...")
     detector.save_model()
     
-    print(f"\nCOMPLETE: Fake Review Detection System test complete!")
+    print(f"\nCOMPLETE: Fake Food Review Detection System test complete!")
 
 if __name__ == "__main__":
     main()

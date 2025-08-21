@@ -37,7 +37,7 @@ class SyntheticReviewGenerator:
         # Fake review patterns and templates
         self.fake_patterns = {
             'generic_positive': [
-                "Great product! Highly recommend!",
+                "Great food! Highly recommend!",
                 "Amazing quality and fast shipping!",
                 "Perfect! Exactly what I needed.",
                 "Love it! Will buy again!",
@@ -68,7 +68,7 @@ class SyntheticReviewGenerator:
         # Real review templates for variation
         self.realistic_templates = {
             'positive': [
-                "I've been using this product for {duration} and I'm really impressed. The {feature} works great and {detail}. Would definitely recommend to {audience}.",
+                "I've been using this product for {duration} and I'm really impressed. The {feature} is great and {detail}. Would definitely recommend to {audience}.",
                 "Initially I was skeptical, but after {duration} of use, I can say this is {opinion}. The {feature} is particularly good. {conclusion}.",
                 "Bought this as a {purpose} and it exceeded my expectations. {detail} The only minor issue is {minor_issue}, but overall very satisfied.",
                 "Great value for the price! {feature} works as expected and {detail}. Shipping was fast and packaging was secure."
@@ -81,17 +81,20 @@ class SyntheticReviewGenerator:
             ]
         }
         
-        # Features and details for template filling
-        self.features = ['battery life', 'build quality', 'design', 'performance', 'user interface', 'connectivity']
+        # Food-specific features and details for template filling
+        self.features = ['taste', 'freshness', 'packaging', 'texture', 'flavor', 'ingredients']
         self.durations = ['2 weeks', '1 month', '3 months', '6 months', 'a year']
-        self.audiences = ['anyone', 'professionals', 'beginners', 'tech enthusiasts', 'families']
-        self.issues = ['inconsistent', 'unreliable', 'poorly designed', 'overpriced', 'difficult to use']
+        self.audiences = ['anyone', 'food lovers', 'families', 'health conscious people', 'cooking enthusiasts']
+        self.issues = ['stale', 'expired', 'poorly packaged', 'overpriced', 'artificial tasting']
         
-        # Product categories and IDs
+        # Food product categories and IDs (based on actual Amazon Fine Food Reviews dataset)
         self.product_categories = {
-            'electronics': ['B08N5WRWNW', 'B07XJ8C8F5', 'B08F7PTF53', 'B085WCRS1J'],
-            'home': ['H12345678', 'H87654321', 'H11111111', 'H22222222'],
-            'books': ['BK1234567', 'BK7654321', 'BK1111111', 'BK2222222']
+            'snacks': ['B000E7L2R4', 'B00I5F7N9K', 'B0002IY5ZY', 'B000EMJHGY'],
+            'beverages': ['B007JBXKFW', 'B003GTR8IO', 'B00C7J5084', 'B004U49QU2'],
+            'condiments': ['B000E63LRO', 'B000LKTTTW', 'B000H25SOU', 'B004RF6TT0'],
+            'baking': ['B00032CZUM', 'B000J3R7Y6', 'B000E8T5TO', 'B001E5E2QS'],
+            'organic': ['B000GZS9XY', 'B004VLINS4', 'B000FPN8TK', 'B006N3IG0E'],
+            'specialty': ['B0001XO398', 'B000I5F8NS', 'B004RF6TT0', 'B000Y7FYSU']
         }
         
         # User behavior patterns for fake accounts
@@ -209,16 +212,16 @@ class SyntheticReviewGenerator:
             sentiment = random.choice(['positive', 'negative'])
             template = random.choice(self.realistic_templates[sentiment])
             
-            # Fill template with robotic choices
+            # Fill template with robotic choices for food products
             review_text = template.format(
                 duration=random.choice(self.durations),
                 feature=random.choice(self.features),
-                detail='It performs within expected parameters.',
+                detail='It meets nutritional specifications.',
                 audience=random.choice(self.audiences),
-                opinion='satisfactory for the specified use case',
-                conclusion='Recommend based on technical specifications.',
-                purpose='replacement unit',
-                minor_issue='minor calibration required',
+                opinion='satisfactory for the specified dietary requirements',
+                conclusion='Recommend based on nutritional analysis.',
+                purpose='dietary supplement',
+                minor_issue='minor flavor variations',
                 issue=random.choice(self.issues),
                 problem='suboptimal',
                 service_quality='adequate'
@@ -264,7 +267,7 @@ class SyntheticReviewGenerator:
                 opinion='quite good',
                 conclusion='Overall positive experience.',
                 purpose='testing',
-                minor_issue='setup complexity',
+                minor_issue='flavor intensity',
                 issue='occasionally inconsistent',
                 problem='not ideal',
                 service_quality='responsive'
@@ -292,10 +295,10 @@ class SyntheticReviewGenerator:
         reviews = []
         
         attack_phrases = [
-            "much better alternatives available",
-            "competitor product X is superior",
-            "overpriced compared to similar items",
-            "misleading marketing claims",
+            "much better food brands available",
+            "competitor product X tastes better",
+            "overpriced compared to similar foods",
+            "misleading nutritional claims",
             "better options for the same price"
         ]
         
@@ -422,10 +425,10 @@ class SyntheticReviewGenerator:
         reviews = []
         
         realistic_texts = [
-            "I purchased this item last month and have been using it regularly. The build quality is solid and it performs as expected. The setup was straightforward, though the instructions could be clearer. Overall, I'm satisfied with this purchase and would consider buying from this brand again.",
-            "After reading several reviews, I decided to try this product. It arrived quickly and was well-packaged. The design is sleek and it fits perfectly in my setup. The performance has been consistent over the past few weeks. My only minor complaint is that it could be slightly quieter during operation.",
-            "This product has both pros and cons. On the positive side, it's well-built and does what it claims to do. The interface is intuitive and I was able to get it working without any issues. However, for the price point, I expected some additional features that are missing. Still, it's a decent value overall.",
-            "I've been using this for about three months now and wanted to share my experience. Initially, I had some concerns about the size, but it turned out to be perfect for my needs. The performance has been reliable and I haven't encountered any major issues. The customer support was helpful when I had a question during setup."
+            "I ordered this food item last month and have been enjoying it regularly. The taste is excellent and it's exactly what I expected. The packaging was secure and everything arrived fresh. The expiration date gives plenty of time to use it. Overall, I'm satisfied with this purchase and would consider buying from this brand again.",
+            "After reading several reviews, I decided to try this product. It arrived quickly and was well-packaged. The flavor is rich and it fits perfectly into my meal planning. The taste has been consistent over the past few weeks. My only minor complaint is that it could be slightly less salty during preparation.",
+            "This food product has both pros and cons. On the positive side, it's fresh and does what it claims to do. The ingredients are clearly listed and I was able to prepare it without any issues. However, for the price point, I expected some additional flavor complexity that is missing. Still, it's a decent value overall.",
+            "I've been eating this for about three months now and wanted to share my experience. Initially, I had some concerns about the taste, but it turned out to be perfect for my dietary needs. The freshness has been reliable and I haven't encountered any major issues. The customer support was helpful when I had a question about ingredients."
         ]
         
         for i in range(count):
