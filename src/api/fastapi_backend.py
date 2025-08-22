@@ -335,10 +335,14 @@ async def get_product_analytics(
                 ]
             }
         
-        # Get product name (if available)
-        product_name_query = "SELECT name FROM products WHERE product_id = ?"
-        product_name_data = execute_query(product_name_query, (product_id,))
-        product_name = product_name_data[0]['name'] if product_name_data else f"Product {product_id}"
+        # Get product name (handle missing columns gracefully)
+        try:
+            product_name_query = "SELECT name FROM products WHERE product_id = ?"
+            product_name_data = execute_query(product_name_query, (product_id,))
+            product_name = product_name_data[0]['name'] if product_name_data else f"Product {product_id}"
+        except:
+            # If 'name' column doesn't exist, just use the product_id
+            product_name = f"Product {product_id}"
         
         return ProductAnalyticsResponse(
             product_id=product_id,
@@ -366,10 +370,10 @@ async def get_user_recommendations(
     """Get personalized recommendations for a user"""
     try:
         # Check if user exists
-        user_query = "SELECT user_id FROM reviews WHERE user_id = ? LIMIT 1"
-        user_exists = execute_query(user_query, (user_id,))
-        
-        if not user_exists:
+        user_query = "SELECT COUNT(*) as count FROM reviews WHERE user_id = ?"
+        user_count = execute_query(user_query, (user_id,))
+
+        if not user_count or user_count[0]['count'] == 0:
             raise HTTPException(status_code=404, detail="User not found")
         
         if refresh:
