@@ -426,7 +426,6 @@ def get_and_display_recommendations(api_client, user_id: str, limit: int, refres
             debug_recommendations(api_client, user_id)
         
         return
-    
     # Success - display recommendations
     display_recommendation_results(recommendations)
 
